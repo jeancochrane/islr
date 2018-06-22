@@ -67,3 +67,43 @@ is the irreducible error.
         
 
 - Often, we're interested in both prediction and inference
+
+### 2.1.2 How Do We Estimate f?
+
+- Shared characteristics of all the approaches we'll cover:
+    - Observe a sample of count `n` observations
+        - Call these "training data"
+    - Apply a statistical learning method to training data to estimate f
+
+- Two types of approaches: **parametric** and **non-parametric**
+
+#### Parametric methods
+
+- Estimating f is basically estimating a set of parameters (or weights) for X
+    - Usual workflow:
+        1. Assume a certain kind of model (e.g. linear: Y is a linear
+           combination of X)
+        2. Find a parameter vector B that estimates X from Y (i.e. "fit" the
+           model) with a procedure
+
+- Pros: simplifies the process, since estimating linear parameters B is easier than
+  fitting an arbitrary `p`-dimensional function
+    - What does "arbitrary `p`-dimensional function" mean in this case? That
+      inputs X behave nonlinearly, perhaps?
+
+- Cons:
+    - Model will not accurately model `f`
+        - Linear relationships are rare in the wild
+    - Danger of overfitting the data
+        - Wouldn't this be worse if we were estimating arbitrary functions
+          though?
+
+#### Non-parametric methods
+
+- No assumption about the "functional form" of `f`
+    - Just fit the data as close as possible, within reasonable constraints
+
+- Pro: can approximate `f` much more closely, since no particular functional
+  form is required
+
+- Con: much more training data is required for it to make sense
