@@ -107,3 +107,73 @@ is the irreducible error.
   form is required
 
 - Con: much more training data is required for it to make sense
+
+### 2.1.3 The Trade-Off Between Prediction Accuracy and Model Interpretability
+
+- Models vary in their "flexibility": i.e. the range of different shapes that
+  they allow `f'` to take
+    - e.x. linear models (like linear regression) are very inflexible
+
+- Inflexible models often offer the benefit of interpretability
+    - This is useful in cases where we're trying to perform inference (where we
+      want to understand the true effect)
+        - In the case of linear models, we have very explicit "weights" that are
+          associated with particular input features; this tells a clear and
+          compelling story about features in isolation of one another
+
+- Flexible models, on the other hand, are harder to interpret, and the
+  relationship between their features and the observed Y will be less clear
+
+- I see why models that permit complex, polynomial interactions between
+  features (e.g. something like `Y = (2x1 + x2)^3 + x2`) would make it harder to
+  parse the impact of individual features, but I don't see why this is
+  necessarily the case for e.g. generalized additive models, which extend the
+  linear model to allow some non-linear relationships (the relationship between
+  each feature and the outcome can be modeled as a curve, instead of a straight
+  line). Is there something about linearity in particular that makes it an easier
+  relationship to interpret, even outside of interactions between features?
+
+- Even when prediction (and not inference) is the goal, however, sometimes less
+  flexible models perform better because more flexible models are more prone to
+  overfitting
+
+### 2.1.4 Supervised vs. Unsupervised Learning
+
+- Two main categories of statistical learning problems: supervised and
+  unsupervised
+
+- Supervised methods: the category represented by every approach we've
+  discussed so far 
+  - Given a response `Yi` for each observation `Xi`, what is the most accurate
+    model that predicts `Y` for future observations, or that clarifies the relationship
+    between `Y` and features of `X`?
+
+- Unsupervised methods: observe a vector of measurements `Xi`, without the
+  corresponding response `Yi`
+  - Possible questions: how are the observations related? Are there natural
+    "groups" that we can define among them? How would we group future
+    observations?
+    - "Clustering" problems
+
+- "Semi-supervised" problems: situations where both approaches are appropriate
+    - e.g. if we have some labeled observations, but also some unlabeled (if
+      labels are expensive to collect, say)
+      - Beyond the scope of the book :(
+
+### 2.1.5 Regression vs. Classification
+
+- **Regression** problems tend to involve quantitative variables (numbers)
+
+- **Classification** problems tend to involve categorical variables (classes) 
+
+- Distinction is not clean-cut
+    - E.g.: logistic regression estimates probabilities (like a regression), but
+      for categorical classes
+        - Don't all methods, regression and classification alike, estimate
+        probabilities? What defines a "regression" precisely?
+    - E.g.: KNN and boosting can be used in the case of both quantitative and
+      qualitative responses
+
+- The appropriate type of method (regression or classification) depends more on
+  the form of the outcome rather than the form of the features, since
+  categorical features can always be coded
