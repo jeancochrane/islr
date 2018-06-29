@@ -177,3 +177,35 @@ is the irreducible error.
 - The appropriate type of method (regression or classification) depends more on
   the form of the outcome rather than the form of the features, since
   categorical features can always be coded
+  - Perhaps a better distinction than quantitative/qualitative is
+    continuous/discrete?
+
+## 2.2 Assessing Model Accuracy
+
+- Key insight: different methods work well in different contexts
+    - Specific to the dataset and the task at hand
+
+### 2.2.1 Measuring the Quality of Fit
+
+- Goal: quantify how close the predictions are to the true response
+
+- Most common technique in **regression** is **mean squared error (MSE)**. In
+  Pythonic pseudocode: 
+
+```python
+# Pairs of observations (xi) with responses (yi)
+observations = [(x1, y1), (x2, y2), ..., (xn, yn)]
+
+# Assuming a model `f`
+MSE = (1 / len(observations)) * sum(((y - f(x)) ** 2) for (x, y) in observations)
+```
+
+- Since MSE above is computed using training data, it is technically the
+  *training MSE*
+  - More interesting: how does the model perform on data it hasn't seen yet?
+    - "test MSE"
+
+- Synonym for flexibility in a model: **degrees of freedom**
+    - Training MSE declines monotonically as degrees of freedom increase; test
+      MSE, however, does not
+        - Sign of overfitting
