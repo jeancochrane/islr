@@ -209,3 +209,148 @@ MSE = (1 / len(observations)) * sum(((y - f(x)) ** 2) for (x, y) in observations
     - Training MSE declines monotonically as degrees of freedom increase; test
       MSE, however, does not
         - Sign of overfitting
+
+### 2.2.2 The Bias-Variance Trade-Off
+
+- Two competing properties in statistical learning methods
+
+- Theorem: expected test MSE for a given `Xi` can always be decomposed into the
+  sum of three quantities:
+    1. The **variance** of `f'(Xi)`
+    2. The squared **bias** of `f'(Xi)`
+    3. The variance of the **error terms**
+
+- In pseudocode:
+
+```python
+# Assuming a model `f` and error terms `E`
+expected((Yi - f(Xi)) **2) == var(f(Xi)) + (bias(f(Xi)) ** 2) + var(E) 
+```
+
+- "Expected test MSE of Xi" (`expected((Yi - f(Xi)) **2)`) is the average test MSE we would
+  obtain (in theory) if we were to repeatedly estimate `f` with a large number of training
+  datasets, testing each one at `Xi` 
+  - Hence, to minimize test MSE, minimize variance and bias
+    - Lower bound: test MSE can never dip below `var(E)`, the irreducible error
+
+- **Variance**: How much the model would change if it were trained on different
+  data
+  - In other words: how resilient is the model to new/different data?
+    - High variance: small changes in training data -> large changes in `f'`
+        - Overfit models are high variance: they don't accomodate changing the
+          data
+    - Low variance: model doesn't change much between training sets
+        - Not uniformly good: e.g. a linear model fit to a polynomial effect
+          will not change much when training data is changed, but will also not
+          capture the effect well
+
+- **Bias**: Error that is introduced by simplifying a complex problem
+    - Or: How predictable is the error produced by the model? (?)
+
+- Generally:
+    - **flexible methods** -> high variance, low bias
+    - **inflexible methods** -> low variance, high bias
+        - There are exceptions, of course! This is a broad generalization
+    - These patterns produce the **U-shaped test MSE curve**
+        - Initially, bias decreases faster than variance increases -- since bias
+        produces a squared error term, test MSE tends to drop quickly
+        - Then as flexibility continues to increase, variance increases while
+          bias stops decreasing; this leads to the uptick in the test MSE error
+          curve
+    - We call these patterns the **bias-variance trade-off**
+        - Minimizing one of either squared bias or variance is relatively easy;
+          minimizing both simulataneously is more difficult
+
+- In real-world applications, directly measuring variance or squared bias is
+  impossible
+    - We have to consider it as a factor contributing to MSE, and as general
+    theories of how models of different flexibilities perform in different
+    contexts
+
+### 2.2.3 The Classification Setting
+
+- Most concepts we've covered so far (like bias-variance trade-off) map well
+  from regression to classification settings
+
+- Rather than MSE, a more common (fundamental) measure of error in
+  classification settings is **error rate**
+    - What percentage of classifications are correctly labelled?
+
+- Error rate in Pythonic pseudocode:
+
+```python
+# Pairs of observations (xi) with responses (yi)
+observations = [(x1, y1), (x2, y2), ..., (xn, yn)]
+
+# Statistical learning model
+def f(X):
+    # ... model here
+    return Y
+
+def error_rate(observations):
+    return (1 / len(observations)) * sum(0 if f(x) == y else 1 for (x, y) in observations)
+```
+
+- Notice the use of an **indicator variable** to measure the error at Xi (0 if
+  Xi = Yi, 1 otherwise)
+
+- Good classifiers are ones where test error rate is smallest
+
+#### Bayes Classifier
+
+- Simple classifier that assigns each observation to the most likely class given
+  its observation values
+
+- Formally, find class j:
+
+```
+maxj(P(Y = j | X = Xi))
+```
+
+- In two-class problems (0 or 1), the decision boundary is simple:
+  the test observation receives a class j if `P(Y = j | X) > 0.5`
+    - Since there are only two classes and the probabilities must add up to 1
+
+- How do we determine the conditional probability? Not explained in this section
+
+- Bayes error rate (irreducible error):
+
+```
+1 - expected(maxj(P(Y = j | X)))
+```
+
+#### K-Nearest Neighbors
+
+- Motivation: computing the Bayes classifier in practice is very difficult,
+  because we don't know the conditional distribution of Y given X
+    - Bayes classifier is the ideal condition
+    - Is it even theoretically possible? Or is it just not computable in
+      polynomial time?
+
+- Alternative possibility: approximate the conditional distribution of Y given
+  X, and use estimated probability
+
+- KNN intuition:
+    1. Find `K` points closest to `Xi` (AKA the set of points `Ni`)
+    2. Approximate `P(Y = j | X = Xi)` as the fraction of points in `Ni` with
+       class `j`
+
+- In Pythonic pseudocode:
+
+```python
+# Given `observations` and `f` as above, and `Ni` as the set of K-nearest neighbors to Xi
+cond_probability = (1 / len(Ni)) * sum(0 if y == j else 1 for (_, y) in Ni)
+```
+
+Where
+
+```
+cond_probability = P(Y = j | X = Xi)
+```
+- Claims we have to use Bayes' rule for classification; why? (Seems like Bayes
+  classifier works with conditional probabilities?)
+
+- Choice of `K` is important
+    - Generally:
+        - low `K` -> more flexible (high variance)
+        - high `K` -> less flexible (high bias)
