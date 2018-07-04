@@ -3,5 +3,8 @@ version: '3'
 services:
   r:
     image: r-base:latest
+    volumes:
+      - .:/opt/islr
+    working_dir: /opt/islr
     entrypoint: 'R'
     command: '--vanilla'

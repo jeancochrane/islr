@@ -189,7 +189,7 @@ is the irreducible error.
 
 - Goal: quantify how close the predictions are to the true response
 
-- Most common technique in **regression** is **mean squared error (MSE)**. In
+- Most common measure in **regression** is **mean squared error (MSE)**. In
   Pythonic pseudocode: 
 
 ```python
@@ -227,11 +227,14 @@ MSE = (1 / len(observations)) * sum(((y - f(x)) ** 2) for (x, y) in observations
 expected((Yi - f(Xi)) **2) == var(f(Xi)) + (bias(f(Xi)) ** 2) + var(E) 
 ```
 
-- "Expected test MSE of Xi" (`expected((Yi - f(Xi)) **2)`) is the average test MSE we would
+- "Expected test MSE of `Xi`" (`expected((Yi - f(Xi)) **2)`) is the average test MSE we would
   obtain (in theory) if we were to repeatedly estimate `f` with a large number of training
   datasets, testing each one at `Xi` 
   - Hence, to minimize test MSE, minimize variance and bias
     - Lower bound: test MSE can never dip below `var(E)`, the irreducible error
+  - Kind of strange that this is defined in terms of a specific `Xi`, and not
+    the test MSE for an entire dataset...? May be something specific to the
+    derivation, I'm guessing?
 
 - **Variance**: How much the model would change if it were trained on different
   data
@@ -253,7 +256,7 @@ expected((Yi - f(Xi)) **2) == var(f(Xi)) + (bias(f(Xi)) ** 2) + var(E)
         - There are exceptions, of course! This is a broad generalization
     - These patterns produce the **U-shaped test MSE curve**
         - Initially, bias decreases faster than variance increases -- since bias
-        produces a squared error term, test MSE tends to drop quickly
+          produces a squared error term, test MSE tends to drop quickly
         - Then as flexibility continues to increase, variance increases while
           bias stops decreasing; this leads to the uptick in the test MSE error
           curve
@@ -291,8 +294,8 @@ def error_rate(observations):
     return (1 / len(observations)) * sum(0 if f(x) == y else 1 for (x, y) in observations)
 ```
 
-- Notice the use of an **indicator variable** to measure the error at Xi (0 if
-  Xi = Yi, 1 otherwise)
+- Notice the use of an **indicator variable** to measure the error at `Xi` (0 if
+  `Xi = Yi`, 1 otherwise)
 
 - Good classifiers are ones where test error rate is smallest
 
@@ -308,10 +311,15 @@ maxj(P(Y = j | X = Xi))
 ```
 
 - In two-class problems (0 or 1), the decision boundary is simple:
-  the test observation receives a class j if `P(Y = j | X) > 0.5`
+  the test observation receives a class `j` if `P(Y = j | X) > 0.5`
     - Since there are only two classes and the probabilities must add up to 1
+    - In >2 class problems, wouldn't we have to compute probabilities for every
+      class for every point? Seems expensive...
 
 - How do we determine the conditional probability? Not explained in this section
+    - Turns out: we can't! That's why the Bayes Classifier is an ideal type:
+      it's not really ever practical that we know the conditional probability
+      distribution of Y given X, but we can try to approximate it 
 
 - Bayes error rate (irreducible error):
 
@@ -328,7 +336,7 @@ maxj(P(Y = j | X = Xi))
       polynomial time?
 
 - Alternative possibility: approximate the conditional distribution of Y given
-  X, and use estimated probability
+  X, and use the _estimated_ probability
 
 - KNN intuition:
     1. Find `K` points closest to `Xi` (AKA the set of points `Ni`)
@@ -338,8 +346,8 @@ maxj(P(Y = j | X = Xi))
 - In Pythonic pseudocode:
 
 ```python
-# Given `observations` and `f` as above, and `Ni` as the set of K-nearest neighbors to Xi
-cond_probability = (1 / len(Ni)) * sum(0 if y == j else 1 for (_, y) in Ni)
+# Given `observations` and `f` as above, and `Ni` as the set of K-nearest neighbors to `Xi`
+cond_probability_j = (1 / len(Ni)) * sum(0 if y == j else 1 for (_, y) in Ni)
 ```
 
 Where
