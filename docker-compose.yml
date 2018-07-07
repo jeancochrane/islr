@@ -8,3 +8,13 @@ services:
     working_dir: /opt/islr
     entrypoint: 'R'
     command: '--vanilla'
+
+  watch:
+    build: ./rmdreload
+    volumes:
+      - .:/opt/watchdir
+    working_dir: /opt/watchdir
+    entrypoint: /bin/bash
+    command: R --vanilla -e "servr::rmdv2(host='0.0.0.0', port=8000)"
+    ports:
+      - "8000:8000"

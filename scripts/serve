@@ -1,0 +1,24 @@
+#!/bin/bash
+
+set -euo pipefail
+
+function usage() {
+    echo -n "Usage: $(basename "$0")
+
+Run a development server accessible at http://localhost:8000 that will compile
+and live-reload any RMarkdown files in this repo.
+
+Navigate to http://localhost:8000 to view a directory tree and select the file
+you're interested in.
+"
+}
+
+if [ "${BASH_SOURCE[0]}" = "${0}" ];
+then
+    if [ "${1:-}" = "--help" ];
+    then
+        usage
+    else
+        docker-compose up watch
+    fi
+fi
