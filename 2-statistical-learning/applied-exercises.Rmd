@@ -1,0 +1,74 @@
+---
+title: Applied Exercises for Chapter 2
+author: Jean Cochrane
+date: 8 July 2018
+---
+
+### Exercise 8
+
+a. First, let's read the `college.csv` data into R:
+
+```{r}
+college = read.csv('data/college.csv')
+```
+
+b. Next, we can change the rownames so that the rows are labelled with the
+college name but that name is not considered part of the data:
+
+```{r}
+# Label each row with the name of the college
+rownames(college) = college[,1]
+
+# Remove the name of the college (column 1) from the data
+college = college[,-1]
+```
+
+c.i. Numerical summary of the dataset:
+
+```{r}
+summary(college)
+```
+
+c.ii. A scatterplot matrix of the first ten columns of the data:
+
+```{r}
+pairs(college[,1:10])
+```
+
+c.iii. A boxplot of `Outstate` vs. `Private`:
+
+```{r}
+outstate = college$Outstate
+private = as.factor(college$Private)
+
+plot(private, outstate, xlab="Private", ylab="Out of State Tuition")
+```
+
+c.iv. Create a new qualitative variable, `Elite`, by binning `Top10perc`:
+
+```{r}
+Elite = rep("No", nrow(college))
+Elite[college$Top10perc>50] = "Yes"
+Elite = as.factor(Elite)
+
+college = data.frame(college, Elite)
+summary(college$Elite)
+```
+
+So there are 78 "elite" universities in this dataset.
+
+Side-by-side boxplots of `Outstate` versus `Elite`:
+
+```{r}
+plot(Elite, outstate, xlab="Elite", ylab="Out of State Tuition")
+```
+
+c.v. Histograms of some of the quantitative variables:
+
+```{r}
+par(mfrow=c(2,2))
+hist(college$Room.Board, plot=TRUE)
+hist(college$Books, plot=TRUE)
+hist(college$Personal, plot=TRUE)
+hist(college$Expend, plot=TRUE)
+```

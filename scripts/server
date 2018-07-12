@@ -19,6 +19,11 @@ then
     then
         usage
     else
-        docker-compose up watch
+        if [ -z "$1" ];
+        then
+            docker-compose run --rm --service-ports watch
+        else
+            docker-compose run --rm --service-ports watch R --vanilla -e "servr::rmdv2(dir='${1}', host='0.0.0.0', port=8000)"
+        fi
     fi
 fi
