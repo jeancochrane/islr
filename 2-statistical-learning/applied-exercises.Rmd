@@ -48,7 +48,7 @@ c.iv. Create a new qualitative variable, `Elite`, by binning `Top10perc`:
 
 ```{r}
 Elite = rep("No", nrow(college))
-Elite[college$Top10perc>50] = "Yes"
+Elite[college$Top10perc > 50] = "Yes"
 Elite = as.factor(Elite)
 
 college = data.frame(college, Elite)
@@ -72,3 +72,187 @@ hist(college$Books, plot=TRUE)
 hist(college$Personal, plot=TRUE)
 hist(college$Expend, plot=TRUE)
 ```
+
+### Exercise 9
+
+Load in the `auto` dataset from a CSV:
+
+```{r}
+auto = na.omit(read.csv('data/auto.csv', header=TRUE))
+```
+
+a. To determine which predictors are quantitative vs. qualitative, let's first
+take a look at a summary of the data:
+
+```{r}
+summary(auto)
+```
+
+Based on this table, we can make the following categorizations:
+
+- **Quantitative**:
+  - `mpg`
+  - `displacement`
+  - `weight`
+  - `acceleration`
+
+- **Qualitative**:
+  - `cylinders`
+  - `year`
+  - `horsepower`
+  - `name`
+  - `origin`
+
+Three of the qualitative variables are tricky: while `cylinders, `year`, and
+`horsepower` are
+all expressed in terms of integers, they are in fact qualitative, since they
+represent distinct bins and are not continuous. (It wouldn't make sense to try
+to predict e.g. mpg for a car with 3.36 cylinders, for example.)
+
+b. The ranges of the quantitative variables include:
+
+```{r}
+range(auto$mpg)
+range(auto$displacement)
+range(auto$weight)
+range(auto$acceleration)
+```
+
+c. The means of the quantiative variables are reported in the `summary` table
+above. To find the standard deviation of each predictor, we can use the built-in
+`sd` function:
+
+```{r}
+sd(auto$mpg)
+sd(auto$displacement)
+sd(auto$weight)
+sd(auto$acceleration)
+```
+
+This gives us the following table:
+
+|    predictor    |  mean  | standard deviation |
+| --------------- | ------ | ------------------ |
+| `mpg`           | 23.52  | 7.83               |
+| `displacement`  | 193.5  | 104.38             |
+| `weight`        | 2970   | 847.90             |
+| `acceleration`  | 15.56  | 2.75               |
+
+d. Slice the data to remove the 10th through 85th samples:
+
+```{r}
+autoSlice = auto[-10:-85,]
+```
+
+It's annoying to have to run the `sd` method separately from `summary`, so
+let's write a quick function to add standard deviations into our summaries:
+
+```{r}
+summaryWithStd = function(vec) {
+    summ = summary(vec)
+    stdev = signif(sd(vec), digits=3)
+    return(c(summ['Min.'], summ['Max.'], summ['Mean'], 'StdDev'=stdev))
+}
+```
+
+Finally, get summaries including the range, mean, and standard deviation for
+each quantitative variable:
+
+```{r}
+summaryWithStd(autoSlice$mpg)
+summaryWithStd(autoSlice$displacement)
+summaryWithStd(autoSlice$weight)
+summaryWithStd(autoSlice$acceleration)
+```
+
+f. In order to determine which other variables might be predictive of `mpg`,
+let's look at some plots:
+
+```{r}
+par(mfrow=c(2,2))
+
+# Remove the `mpg` column
+colnamesNoMpg = colnames(auto[,!(colnames(auto) %in% c('mpg'))])
+
+# Make plots for each column
+for (col in colnamesNoMpg) {
+    plot(auto[,col], auto$mpg, xlab=col, ylab='mpg')
+}
+```
+
+There are a few plots in here that demonstrate monotonic relationships with
+relatively-tight distributions:
+
+1. `displacement`
+2. `weight`
+3. `acceleration`
+
+I would consider these variables to be good candidates for predicting `mpg`.
+
+### Exercise 10
+
+a. Load the Boston housing data set:
+
+```{r}
+library(MASS)
+```
+
+Find the number of rows and columns:
+
+```{r}
+dim(Boston)
+```
+
+Each row represents a town in the suburb of Boston, and each column is
+a particular measurement of that town.
+
+e. To find the number of suburbs that bound the Charles river:
+
+```{r}
+dim(Boston[Boston$chas == 1,])[1]
+```
+
+f. Median pupil-teacher ratio for towns in the dataset:
+
+```{r}
+median(Boston$ptratio)
+```
+
+g. Two suburbs are tied for the lowest median value of owner-occupied homes:
+
+```{r}
+Boston[Boston$medv == min(Boston$medv),]
+```
+
+Few surprises here: for variables that we might assume would predict lower
+house prices, the predictors for these towns are all in the upper quartile (if
+not the max itself). One predictor surprised me, however: the weighted mean of
+distances to employment centers (`dis`), which at 1.49 and 1.43 is in the lower
+end of the distribution across the dataset:
+
+```{r}
+summary(Boston$dis)
+```
+
+A few different possibilities:
+
+1. I'm misinterpreting this variable and lower values actually indicates
+   _further_ distances from employment centers
+2. The effect of distance on house price is not what I would have guesssed
+   (i.e. further distances from employment centers predicts higher house prices)
+3. Something is unusual about these two neighborhoods, and they don't fit the
+   usual trend of `dis` predicting `medv`
+
+We can at least adjudicate between hypotheses 2 and 3 above by making a quick
+plot of the relationship between `dis` and `medv`:
+
+```{r}
+plot(Boston$dis, Boston$medv, xlab='Distance from employment centers',
+     ylab='Median house price')
+```
+
+The distribution here is pretty unusual, and it's hard to determine an effect
+just by looking at it. If anything I'd guess a logarithmic effect, with
+a prominent outlier cluster very close to employment centers (perhaps suburbs
+that are very close to the city center?) but we'll have to wait for the
+regression chapters to explore that question in a more principled fashion.

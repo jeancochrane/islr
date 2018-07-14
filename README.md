@@ -19,7 +19,15 @@ To **compile and livereload RMarkdown files**, run the following command and
 visit the development server at `http://localhost:8000`:
 
 ```
-./scripts/serve
+./scripts/server
+```
+
+You can compile files from outside the root directory by passing the directory
+name as an argument to the `serve` script:
+
+```bash
+# Compile RMarkdown files in the ./2-statistical-learning directory
+./scripts/server ./2-statistical-learning
 ```
 
 To **clean up unused Docker resources** once you're done developing:
