@@ -19,7 +19,7 @@
     - Synergy between predictors?
 
 - Defining linear regression
-    - **Minimizes squared residual** of the training data
+    - **Minimizes residual sum of squares** of the training data
         - "Least squares"
 
 - Assessing accuracy of coefficients
