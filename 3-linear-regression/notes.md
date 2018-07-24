@@ -143,3 +143,81 @@ t = (B1 - 0) / (SE(B1))
           accident 
     - Uses the fact that the t-distribution is well-known, and approximately
       similar to the normal distribution when `n > 30`
+
+### 3.1.3 Assessing the Accuracy of the Model
+
+- How well does the model fit the data?
+    - Measures of "lack of fit" (or "goodness of fit")
+    - Two metrics;
+        1. **Residual standard error (RSE)**
+        2. **R-squared**
+
+#### Residual standard error
+
+- Estimate of the standard deviation of E, the irreducible error term
+    - How much does the average response (data point) differ from what is predicted by the
+      true effect?
+
+- Once again:
+
+```python
+RSE = sqrt(RSS/(n-2))
+```
+
+- Reported in the same units as the response
+
+#### R-squared
+
+- As opposed to RSE, R-squared is a unit-less proportion
+    - In some sense, a more "objective" (standardized) measure of goodness of
+      fit
+    - AKA: "proportion of variance explained"
+
+- Mathematically:
+
+```python
+# Total sum of squares -- sum of squared difference from the mean
+TSS = sum((y - mean(y))**2 for _, y in training)
+
+# Residual sum of squares -- sum of squared difference from the observation
+RSS = sum((y - f(x))**2 for x, y in training)
+
+# R-squared
+R2 = (TSS - RSS)/TSS = 1 - (RSS/TSS)
+```
+
+- Think of TSS as the inherent variability in responses `Y`, before regression
+    - RSS, on the other hand, represents the variability that remains _after_
+      regression
+        - Hence, R-squared measures: how much of the inherent variability (TSS)
+          is explained by the regression variability (RSS)?
+
+- In single linear regression, R-squared is equivalent to the **squared
+  correlation**
+    - However, this doesn't hold in higher dimensions, since correlation is
+      a pairwise comparison
+        - R-squared serves as a replacement
+
+## 3.2 Multiple Linear Regression
+
+- Extend linear regression for higher dimensions such that each predictor gets
+  its own slope coefficient:
+
+```python
+Y = B0 + (B1*X1) + (B2*X2) + ... + (Bp*Xp) + E
+```
+
+- Interpretation of coefficients: **average effect on Y of a one-unit increase
+  in Xj, holding all other predictors fixed**
+    - Last part is important! Assumes independence between the predictors. If
+      predictors are at all correlated, it's not meaningful to "hold them fixed"
+
+### 3.2.1 Estimating the Regression Coefficients
+
+- As in simple linear regression: minimize sum of squared residuals (RSS)
+
+- Simple/multiple regression coefficients can be quite different!
+    - In particular: if two predictors are correlated, one of them may appear
+      very significant in a single regression setting, but have little to no
+      effect under multiple regression
+        - e.g. Shark attacks, ice cream sales, and temperature
