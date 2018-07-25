@@ -221,3 +221,67 @@ Y = B0 + (B1*X1) + (B2*X2) + ... + (Bp*Xp) + E
       very significant in a single regression setting, but have little to no
       effect under multiple regression
         - e.g. Shark attacks, ice cream sales, and temperature
+
+### 3.2.2 Some important questions
+
+- Four questions implicated by multiple regression:
+
+1. Is at least one of the predictors useful?
+2. Do all the predictors help explain `Y`, or only a subset?
+3. How well does the model fit the data?
+4. Given a set of predictor values, what would we predict?
+
+#### Is there a relationship between the predictors and the response?
+
+- Extend hypothesis testing to multiple variables
+    - Hypothesis: All the coefficients are 0
+
+- **F-statistic**
+    - Is at least one predictor useful in predicting `Y`?
+    - When F-statistic is close to 1, hypothesis cannot be rejected
+        - How close? Use values of `n` (number of observations) and `p` (number
+          of predictors) to compute the p-value
+            - Note: F-statistic can be shown to follow an F-distribution when
+              the error term `E` is normally distributed, and/or `n` is very
+              large
+
+- Formally:
+
+```python
+# Compute the F-statistic
+F = ((TSS-RSS)/p) / (RSS/(n-p-1))
+```
+
+- Both numerator and denominator have an expected value of `Var(E)` when the
+  null hypothesis is true, so in that case we expect `F = 1` 
+
+- How to compute F-statistic for a subset of the predictors?
+    - Substitute `TSS` for `RSS0`
+        - Where `RSS0` represents the residual sum of squares for a model that
+          is missing the predictors in question
+
+```python
+# Compute the F-statistic for a subset of predictors
+# (q is the number of predictors in the subset)
+F = ((RSS0-RSS)/q) / (RSS/(n-p-1))
+```
+
+- t-statistic is equivalent to the F-statistic for the subset of the data that
+  only includes one predictor
+    - Square of the t-statistic is the corresponding F-statistic
+        - Derivation? (This would be fun to show algebraically)
+    - "Partial effects"
+
+#### A note on p-hacking
+
+- In the case where there are a lot of predictors and the null hypothesis is
+  true, a certain percentage of p-values will be below 0.05 by chance (the
+  nature of the t-distribution)
+    - e.g. when `p = 100`, we should expect 5% of p-values to be below 0.05
+      (since t-distribution approximates normal distribution)
+
+- F-statistic is relatively resilient to this problem, since it factors in the number of
+  predictors (degrees of freedom)
+    - However, when `p` is very large (in particular when `p > n`), the
+      F-statistic and linear regression do not work, and we need to rely on
+      different methods
