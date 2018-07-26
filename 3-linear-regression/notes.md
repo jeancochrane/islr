@@ -231,7 +231,7 @@ Y = B0 + (B1*X1) + (B2*X2) + ... + (Bp*Xp) + E
 3. How well does the model fit the data?
 4. Given a set of predictor values, what would we predict?
 
-#### Is there a relationship between the predictors and the response?
+#### Question 1: Is there a relationship between the predictors and the response?
 
 - Extend hypothesis testing to multiple variables
     - Hypothesis: All the coefficients are 0
@@ -285,3 +285,93 @@ F = ((RSS0-RSS)/q) / (RSS/(n-p-1))
     - However, when `p` is very large (in particular when `p > n`), the
       F-statistic and linear regression do not work, and we need to rely on
       different methods
+
+#### Question 2: Which variables are important?
+
+- If F-statistic test indicates that at least one predictor is related to the
+  response, natural follow-up: which ones?
+    - Task: **variable selection**
+        - Studied more extensively in Chapter 6
+
+- Ideal test: Try out lots of models with different sets of predictors
+    - Testing all combinations is computationally intesive (`q**p`)
+
+- Three practical approaches:
+
+1. **Forward selection**
+    - Begin with _null model_ (intercept only)
+    - Fit `p` regressions and add the "best" variable (lowest RSS)
+    - Continue until a stopping rule is satisfied
+        - e.g. Model performs below a certain RSE cutoff
+
+2. **Backward selection**
+    - Begin with all variables in the model
+    - Remove the variable with the largest p-value
+    - Continue until a stopping rule is satisfied
+        - e.g. All remaining variables have a p-value below a certain cutoff
+
+3. **Mixed selection** (Combine forward/backward)
+    - Start with null model
+    - Add the best-fit variable
+    - As variables are added, p-values for in-model variables may grow; after
+      a certain cutoff, remove that variable
+    - Continue until a stopping rule is satisfied
+        - e.g. All variables in the model are below a certain p-value cutoff,
+          and all variables outside the model are above another cutoff
+
+- Tradeoffs to each approach:
+    - Forward selection
+        - Pro: Is not restricted by the number of observations or predictors
+        - Con: Greedy; can include predictors that later are revealed to be
+          irrelevant
+    - Backward selection
+        - Pro: Adds the most context (less likely to include insignificant)
+          variables
+        - Con: Only works when `n < p` (because fitting the model won't work
+          otherwise)
+    - Mixed selection
+        - Attempts to balance the two
+
+#### Question 3: How well does the model fit?
+
+- Use the two common metrics: **RSE** And **R-squared** (proportion of variance
+  explained)
+
+- In multiple regression, R-squared represents the square of the correlation
+  between the response and the fitted model (`R2 = Cor(Y, Y')**2`)
+    - In fact, fitted model maximizes this correlation among all possible
+      models!
+        - Note that this is not always desirable: more variables will always
+          increase R-squared, even if the variables don't add much 
+            - Comes from the fact that R-squared is computed on the training
+              data
+            - In contrast, RSE can _increase_ with more variables, since RSE is
+              scaled by the number of predictors (`n-p-1`, simplifying to `n-2`
+              in the single-variable case) and additional variables may not
+              decrease RSS by enough to compensate
+
+- Another tactic: graphical summaries
+    - Useful when `p <= 3`
+    - Identify areas where the model consistenly over/underperforms
+
+#### Question 4: For an unseen value, what do we predict?
+
+- Creating predictions from new data is trivial, but three important
+  considerations should humble us:
+
+1. The least squares plane is only an approximation of the _true population regression
+   plane_ -- some amount of reducible error always remains
+    - Confidence intervals help establish how close we think we should be to the
+      true plane
+2. The true effect is never perfectly linear, introducing some amount of _model
+   bias_
+3. Even if we had the population regression plane, the irreducible/random error
+   `E` remains in the model
+
+- Two ways of measuring error:
+    1. **Confidence interval**: If we repeated this sampling and regression many
+       times, in what interval would 95% of the scores lie?
+        - Measures _reducible error_
+    2. **Prediction interval**: Measures accuracy of the score for a single
+       observation
+        - Measures _irreducible error_
