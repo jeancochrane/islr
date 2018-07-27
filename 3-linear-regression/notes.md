@@ -374,4 +374,87 @@ F = ((RSS0-RSS)/q) / (RSS/(n-p-1))
         - Measures _reducible error_
     2. **Prediction interval**: Measures accuracy of the score for a single
        observation
-        - Measures _irreducible error_
+        - Measures reducible error plus _irreducible error_
+
+## 3.3 Other Considerations in the Regression Model
+
+### 3.3.1 Qualitative Predictors
+
+- Qualitative predictors (AKA **factors**) require some processing to make sense
+    - Simplest form: two levels
+
+#### Binary predictors
+
+- Process: create an indicator ("dummy") variable with two possible values,
+  0 and 1
+
+```python
+# Code the indicator variable. 
+xi = 1 if True else 0
+
+# Dummy variable affects the regresion like so:
+if xi:
+    yi = B0 + B1 + E
+else:
+    yi = B0 + E
+```
+
+- In this case, coefficients has the following interpretation:
+    - `B0`: Average score in the falsey class 
+    - `B0 + B1`: Average score in the truthy class 
+    - `B1`: Average difference in scores between classes 
+
+- However, if we code the indicators as `1` and `-1`, we can see a different
+  interpretation;
+    - `B0`: Overall average score
+    - `B1`: "Truthy" effect
+
+#### More than two classes
+
+- One approach: For `n` classes, define `n-1` indicator variables as above
+    - One class will use the intercept, and will be the _baseline_
+    - Use F-test to test for significance
+
+- There are more approaches, but it's beyond the scope of this book
+
+### 3.3.2 Extensions of the Linear Model
+
+- Two important assumptions underlying the linear model:
+    - **Additive assumption**: The effect of a change in a predictor `Xj` on the
+      response `Y` is independent of other predictors in `X`.
+        - Assume no _interaction effects_
+    - **Linear assumption**: A unit change in `Xj` produces a constant change in
+      `Y`, no matter what the existing level of `Xj` is.
+    - Liberman would add the _reversibility assumption_: that a negative change
+      in `Xj` will lead to a corresponding negative change in `Y`
+
+#### Removing the Additive Assumption
+
+- Interaction effects are predicted by the `Advertising` data: the model
+  consistently overpredicts sales when `TV` and `radio` are low, and
+  underpredicts when they're high
+    - This suggests that there's an interaction between `TV` and `radio`
+
+- One way of dealing with interactions: introduce an **interaction term**
+
+```python
+# Standard two-variable linear model.
+Y = B0 + (B1*X1) + (B2*X2) + E
+
+# Extended with an interaction term.
+Y_interaction = B0 + (B1*X1) + (B2*X2) + (B3*X1*X2) + E
+
+# Simplify the interaction term to demonstrate the effect of X2 on X1.
+Y_simplified = B0 + ((B1 + (B3*X2))*X1) + (B2*X2) + E
+```
+
+- Interpretation of `B3`: Increase (or decrease) in strength of `X1` due to
+  a one-unit increase in `X2`
+    - Or vice versa
+
+- **Hierarchical principle**: If you use an interaction term you must include
+  all variables in the model, _even when their coefficients are not significant_
+    - Two reasons:
+        1. If `X1 * X2` is predictive of the response, it doesn't matter if the
+           coefficients of `X1` and `X2` are 0
+        2.  `X1 * X2` is usually (always?) correlated with `X1` and `X2`
