@@ -458,3 +458,121 @@ Y_simplified = B0 + ((B1 + (B3*X2))*X1) + (B2*X2) + E
         1. If `X1 * X2` is predictive of the response, it doesn't matter if the
            coefficients of `X1` and `X2` are 0
         2.  `X1 * X2` is usually (always?) correlated with `X1` and `X2`
+
+- Interaction variables have a particularly nice interpretation when quantiative
+  predictors are mixed with factors
+    - Note that in the absence of an interaction variable, the model defines two
+      parallel lines with different intercepts:
+
+```python
+if factor == 1:
+    Y = B0 + (B1*X1) + (B2*1) = B0 + (B1*X1) + B2
+else:
+    Y = B0 + (B1*X1) + 0 = B0 + (B1*X1)
+```
+
+- However, with an interaction variable, the model defines two lines with
+  different intercepts and different slopes:
+
+```python
+if factor == 1:
+    Y = B0 + (B1*X1) + (B2*1) + (B3*X1*1) = (B0 + B2) + (B1 + B3)*X
+else:
+    Y = B0 + (B1*X) + (B3*X1*0) = B0 + (B1*X)
+```
+
+#### Non-linear Relationships
+
+- Simple way of extending linear regression to nonlinear situations:
+  **polynomial regression**
+
+- Intuition: To get a quick nonlinear model, use a nonlinear transformation of
+  the input parameter
+  - e.g. for a quadratic relationship:
+
+```python
+Y = B0 + (B1*X1) + (B2*(X1**2)) + E
+```
+
+- The key is that the above equation is still a linear model, where `X2 = X1**2`
+
+### 3.3.3 Potential Problems
+
+#### 1. Non-linearity of the Data
+
+- If the true effect isn't linear, then the model will always have problems
+  (bias)
+    - Useful tool for figuring this out: **residual plots**
+        - Simple regression: Plot the residual `ei = yi - f(xi)` versus `x`
+        - Multiple regression: Plot the residual vs. the fitted `f(xi)`
+            - Since there are multiple predictors
+            - What does this look like?
+
+#### 2. Correlation of Error Terms
+
+- Certain parts of the linear model assume uncorrelated error terms
+    - i.e. knowing the sign of `ei` doesn't indicate anything about the sign of
+      `ei+1`
+    - e.g. Standard error for coefficients
+        - Correlation -> underestimate standard errors
+            - p-values will overestimate confidence
+
+- Common problem in time-series data
+    - Consistent measurement errors at points in time
+        - Investigate: plot the residuals vs. time
+        - "tracking": adjacent residuals have similar values
+
+#### 3. Non-constant Variance of Error Terms
+
+- Standard error, confidence interval, and hypothesis testing rely on the
+  assumption that variance among errors is constant
+    - If not: funnel-shaped residual plot
+
+#### 4. Outliers
+
+- Generally easy to remove outliers -- harder is: principled method for
+  selecting them?
+    - One test: _studentized residual_
+        - Residuals weighted by their estimated standard error (how many
+          standard deviations the residual is away from the mean)
+        - `abs(studentized_residual) > 3` -> outlier 
+
+#### 5. High Leverage Points
+
+- Outliers have unusual values for `y`; leverage points have unusual values for
+  `x`
+    - Potentially can sway the model
+    - Difficult to identify in high dimensions
+
+- Compute the **leverage statistic**
+    - Always between `1/n` and 1
+    - Average leverage is always `(p+1)/n`
+
+```python
+hi = (1/n) + (xi - mean(x))**2 / sum(x - mean(x)**2 for x in X)
+```
+
+#### 6. Collinearity
+
+- Two or more predictors are closely related (correlated)
+    - Makes it difficult to sort out each one's relationship with the response
+        - Collinearity means that the standard error for `Bj` grows, since the
+          accuracy of the coefficient estimates is lower (a wider range of
+          estimates can minimize RSS)
+            - Hence, t-statistic shrinks (`Bj/SE(Bj)`), and it's harder to
+              reject the null
+            - "low-powered test": probability of correctly detecting a non-zero
+              coefficient is low
+
+- Simple detection tool: **correlation matrix**
+    - Compute the correlations between each predictor
+    - Not perfect; each correlations can exist between three variables, but no
+      pairwise correlations (multicollearity)
+
+- More advanced detection tool: **variance inflation factor** (VIF) 
+    - Variance of `Bj` in the full model vs. variance of `Bj` fit on its own
+        - VIF > 5-10 is problematic
+
+- Two approaches:
+    1. Drop one of the problematic variables
+    2. 
