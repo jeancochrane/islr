@@ -575,4 +575,32 @@ hi = (1/n) + (xi - mean(x))**2 / sum(x - mean(x)**2 for x in X)
 
 - Two approaches:
     1. Drop one of the problematic variables
-    2. 
+    2. Combine collinear predictors into a single variable
+
+## 3.5. Comparison of Linear Regression with K-Nearest Neighbors
+
+- Parametric methods:
+    - Pros: easily interpretable
+    - Cons: make strong, not necessarily true assumptions about the form of the
+      true effect
+
+- **K-Nearest Neighbors regression** is closely related to the KNN classifier we
+  discussed in [chapter 2](../2-statistical-learning/notes.md)
+    - Recap: Given an observation `x0` and a value for `K`:
+        1. Find `K` training observations closest to `x0` (the set `N0`)
+        2. Estimate `f(x0)` using the average of the responses in `N0`:
+
+```python
+knn_estimate = (1/K) * (sum(y for y in N0))
+```
+
+- When is parametric better than non-parametric?
+    - When the parametric form is close to the true form of `f`
+    - When the true effect is substantially nonlinear, on the other hand, KNN
+      can approximate the true effect much more closely
+        - However: this is not guaranteed! e.g. in high dimensions with lots of
+          noise (e.g. with explicit noise variables) test MSE for KNN increases
+          much more quickly than linear regression
+            - **Curse of dimensionality**: More dimensions -> effective
+              reduction in sample size; the observations in `N0` may in fact be
+              very far away from `x0` in `p`-dimensional space when `p` is large
