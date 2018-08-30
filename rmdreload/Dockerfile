@@ -6,7 +6,8 @@ RUN apt-get update && \
 					   pandoc
 
 RUN R -e "install.packages('rmarkdown')" && \
-	R -e "install.packages('servr')"
+	R -e "install.packages('servr')"  && \
+	R -e "install.packages('ISLR')"
 
 COPY . /opt/rmdreload
 WORKDIR /opt/rmdreload

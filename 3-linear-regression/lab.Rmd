@@ -1,0 +1,80 @@
+---
+title: Applied Exercises for Chapter 2
+author: Jean Cochrane
+date: 8 July 2018
+---
+
+# 3.6.1 Libraries
+
+Load R packages:
+
+```{r}
+library(MASS)
+library(ISLR)
+```
+
+# 3.6.2 Simple Linear Regression
+
+Print column names:
+
+```{r}
+names(Boston)
+```
+
+Regress `medv` on `lstat` (median home value on percent of households with low
+socioeconomic status):
+
+```{r}
+lm.fit = lm(medv~lstat, data=Boston)
+```
+
+Print a summary of the model:
+
+```{r}
+summary(lm.fit)
+```
+
+Get coefficients of the model:
+
+```{r}
+coef(lm.fit)
+```
+
+Get confidence interval of the model coefficients:
+
+```{r}
+confint(lm.fit)
+```
+
+Predict values for `medv` given values of `lstat`, returning
+a confidence interval:
+
+```{r}
+predict(lm.fit, data.frame(lstat=c(5, 10, 15)), interval="confidence")
+```
+
+Now returning a prediction interval:
+
+```{r}
+predict(lm.fit, data.frame(lstat=c(5, 10, 15)), interval="prediction")
+```
+
+Plot the least squares regression line:
+
+```{r}
+plot(Boston$lstat, Boston$medv)
+abline(lm.fit, lwd=3, col="red")
+```
+
+Experiment with plotting options:
+
+```{r}
+plot(1:20, 1:20, pch=1:20)
+```
+
+Generate default diagnostic plots for the model:
+
+```{r}
+par(mfrow=c(2, 2))
+plot(lm.fit)
+```
