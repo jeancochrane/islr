@@ -78,3 +78,161 @@ Generate default diagnostic plots for the model:
 par(mfrow=c(2, 2))
 plot(lm.fit)
 ```
+
+Plot the residuals:
+
+```{r}
+plot(predict(lm.fit), residuals(lm.fit))
+```
+
+Plot the studentized residuals:
+
+```{r}
+plot(predict(lm.fit), rstudent(lm.fit))
+```
+
+Looks like there's some nonlinearity!
+
+Compute leverage statistics:
+
+```{r}
+plot(hatvalues(lm.fit))
+```
+
+Find the index of the observation with the largest leverage statistic:
+
+```{r}
+which.max(hatvalues(lm.fit))
+```
+
+And the observation itself:
+
+```{r}
+Boston[which.max(hatvalues(lm.fit)), 'lstat']
+```
+
+# 3.6.3 Multiple Linear Regression
+
+To fit a model with `n` predictors, use the following syntax:
+
+```
+lm.fit = lm(y~x1+x2+...+x3)
+```
+
+Fit a model to `medv` using `lstat` and `age`:
+
+```{r}
+lm.fit = lm(medv~lstat+age, data=Boston)
+summary(lm.fit)
+```
+
+Fit a model using all 13 predictors:
+
+```{r}
+lm.fit = lm(medv~., data=Boston)
+summary(lm.fit)
+```
+
+Fit a model using all predictors except for `age`:
+
+```{r}
+lm.fit.no.age = lm(medv~.-age, data=Boston)
+summary(lm.fit.no.age)
+```
+
+# 3.6.4 Interaction Terms
+
+Use the syntax `x1:x2` to add an interaction term between `x1` and `x2`, or use
+`x1*x2` to include both predictors and the interaction term at the same time (a
+shorthand for `x1+x2+x1:x2`):
+
+```{r}
+summary(lm(medv~lstat*age, data=Boston))
+```
+
+# 3.6.5 Non-linear Transformations of the Predictors
+
+To create nonlinear transformations of predictors in the context of a linear
+model formula, use the built-in `I()` function to ensure that `^` is treated
+"as-is" (and not using the formula-specific syntax):
+
+```{r}
+lm.fit2 = lm(medv~lstat+I(lstat^2), data=Boston)
+summary(lm.fit2)
+```
+
+We can use the `anova` function to test the hypothesis that the model with
+a nonlinear term is superior to the original model (the null hypothesis is that
+both models perform equally well):
+
+```{r}
+lm.fit = lm(medv~lstat, data=Boston)
+anova(lm.fit, lm.fit2)
+```
+
+Plot the diagnostics for the new model to confirm that the residual plot has
+improved:
+
+```{r}
+par(mfrow=c(2,2))
+plot(lm.fit2)
+```
+
+For higher-order polynomials, use the built-in `poly()` function:
+
+```{r}
+lm.fit5 = lm(medv~poly(lstat, 5), data=Boston)
+summary(lm.fit5)
+```
+
+# 3.6.6 Qualitative Predictors
+
+Examine the predictors in the `Carseats` dataset:
+
+```{r}
+names(Carseats)
+```
+
+In this case, `ShelveLoc` is a qualitative predictor, which can take the value of
+`Bad`, `Medium`, or `Good` (corresponding to the placement of the car seat on
+the store shelf). Given such a qualitative variable, R generates dummy variables
+automatically.
+
+Fit a multiple regression model with some interaction terms:
+
+```{r}
+lm.fit = lm(Sales~.+Income:Advertising+Price:Age, data=Carseats)
+summary(lm.fit)
+```
+
+Use the `constrasts()` function to read out the coding that R uses for the dummy
+variables under the hood:
+
+```{r}
+contrasts(Carseats$ShelveLoc)
+```
+
+Since the coefficients for `ShelveLocGood` and `ShelveLocMedium` are both
+positive and significant in the summary above, we can say with confidence that `Good`
+and `Medium` shelf positions both predict higher sales than `Bad` shelf
+positions. Further, since the coefficient for `ShelveLocGood` is greater than
+the coefficient for `ShelveLocMedium`, we can be confident that a `Good` shelf
+position will be better for sales than a `Medium` shelf position.
+
+# 3.6.7 Writing Functions
+
+Write a simple function to load the `MASS` and `ISLR` libraries:
+
+```{r}
+LoadLibraries = function() {
+    library(ISLR)
+    library(MASS)
+    print("The MASS and ISLR libraries have been loaded.")
+}
+```
+
+Call the function:
+
+```{r}
+LoadLibraries()
+```
