@@ -1,0 +1,96 @@
+---
+title: Applied Exercises for Chapter 3
+author: Jean Cochrane
+date: 7 September 2018
+---
+
+## Exercise 8
+
+This question involves the use of simple linear regression on the `Auto`
+dataset.
+
+### Exercise 8a.
+
+Use the `lm()` function to perform a simple linear regression with `mpg` as the
+response and `horsepower` as the predictor. Use the `summary()` function to
+print the results. Comment on the output. For example:
+
+i. Is there a relationship between the predictor and the response?
+ii. How strong is the relationship between the predictor and the response?
+iii. Is the relationship between the predictor and the response positive or
+negative?
+iv. What is the predicted `mpg` associated with a `horsepower` of 98? What are
+the associated 95% confidence and prediction intervals?
+
+### Answer 8a.
+
+Use `lm` to regress `mpg` on `horsepower`:
+
+```{r}
+# Load the Auto dataset.
+library(ISLR)
+
+# Regress MPG on horsepower.
+model = lm(mpg~horsepower, data=Auto)
+summary(model)
+```
+
+As the results show, there is indeed a relationship between `horsepower` and
+`mpg`. The `horsepower` coefficient is around -0.158, meaning that a one-unit
+increase in horsepower corresponds to about 0.15 _fewer_ miles per gallon. (This
+makes sense, as we would predict that a more powerful engine might be less
+efficient.) The relationship is quite significant, with a p-value < 0.001.
+
+Note that while the relationship exists, however, it is not terribly strong. Our
+R-squared reports that `horsepower` accounts for only about 60% of the variance of
+`mpg`. There are likely other factors with a substantial impact on `mpg`,
+although `horsepower` does an OK job approximating the effect.
+
+We can get a predicted confidence interval for a `horsepower` of 98 using the
+`predict` method:
+
+```{r}
+predict(model, data.frame(horsepower=c(98)), interval="confidence")
+```
+
+The model predicts a value for `mpg` of 24.47, with 95% confidence that the true
+value lies in the range `[23.97, 24.96]`.
+
+`predict` also allows us to generate a prediction interval:
+
+```{r}
+predict(model, data.frame(horsepower=c(98)), interval="prediction")
+```
+
+In this case, taking into account an estimate for the irreducible error in the
+data, the model predicts a range of `[14.81, 34.12]` -- there's quite a lot of
+noise in the data!
+
+## Exercise 8b.
+
+Plot the response and the predictor. Use the `abline()` function to display the
+least squares regression line.
+
+## Answer 8b.
+
+```{r}
+plot(Auto$horsepower, Auto$mpg)
+abline(model, lwd=3, col="red")
+```
+
+From this plot, there's a pretty good indication that the true effect is nonlinear.
+
+## Exercise 8c.
+
+Use the `plot()` function to produce diagnostic plots of the least squres
+regresion fit. Comment on any problems you see with the fit.
+
+## Answer 8c.
+
+```{r}
+par(mfrow=c(2,2))
+plot(model)
+```
+
+The `Residuals vs Fitted` plot clearly shows that there's a pattern to the
+residuals, confirming that the model is not linear.
